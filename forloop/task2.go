@@ -1,4 +1,4 @@
-package forloop
+package main
 
 import "fmt"
 
