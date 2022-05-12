@@ -12,7 +12,7 @@ func main() {
 	var b []rune = []rune(text)
 	if unicode.IsUpper(b[0]) && string(b[len(b)-1]) == "." {
 		fmt.Println("Right")
-	} else {giz
+	} else {	
 		fmt.Println("Wrong")
 	}
 }
