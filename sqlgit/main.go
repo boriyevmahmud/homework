@@ -15,7 +15,6 @@ func main() {
 		panic("error while connecting to db")
 	}
 	defer db.Close()
-	
 
 	query := `select * from users`
 	result := db.QueryRow(query)
@@ -24,5 +23,5 @@ func main() {
 		return
 	}
 	fmt.Println(result)
-	
+
 }
