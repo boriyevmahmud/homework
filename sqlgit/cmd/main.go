@@ -13,18 +13,18 @@ import (
 // 3. array postgres example: postal_codes, phone_number
 
 type Customer struct {
-	ID          string
-	FirstName   string
-	LastName    string
-	Username    string
+	ID        string
+	FirstName string
+	LastName  string
+	Username  string
 	//PhoneNumber []Phone
 	//Adress      []Adress
 	//Products    []Product
-	Email       string
-	Gender      string
-	Birthdate   string
-	Password    string // should be hashed and validate password should be 8 symbols
-	Status      string
+	Email     string
+	Gender    string
+	Birthdate string
+	Password  string // should be hashed and validate password should be 8 symbols
+	Status    string
 }
 
 type Adress struct {
@@ -181,7 +181,39 @@ func main() {
 		}
 	case 2:
 		{
-
+			dbs := Dbmethods{}
+			err = dbs.Update(Customer{
+				FirstName: "Jamshid",
+				LastName:  "Hatsker",
+				Username:  "ikoromov",
+				Email:     "ji@gmail.com",
+				Gender:    "Male",
+				Birthdate: "2000-01-01",
+				Password:  "mahmud3",
+				Status:    "Mujik"},
+				Adress{
+					Country:     "Uzb",
+					City:        "Tash",
+					District:    "Qibray",
+					PostalCodes: 10982},
+				Product{
+					Name:        "Asus",
+					Cost:        1200,
+					OrderNumber: 123,
+					Amount:      1,
+					Currency:    "UZS",
+					Rating:      90},
+				Phone{
+					Numbers: 994563253,
+					Code:    "+998"},
+				Type{
+					Name: "Computer",
+				},
+			)
+			if err != nil {
+				panic(err)
+			}
+			fmt.Println("Datas updated successfully")
 		}
 	case 3:
 		{
@@ -247,7 +279,45 @@ func (h Dbmethods) Create(cus Customer, ad Adress, pr Product, ph Phone, ty Type
 
 	return err
 }
-
+func (h Dbmethods) Update(cus Customer, ad Adress, pr Product, ph Phone, ty Type) error {
+	connStr := "user=postgres password=1 dbname=shop sslmode=disable"
+	db, err := sql.Open("postgres", connStr)
+	check(err)
+	var uuid, uuid1 string
+	fmt.Println("UUID of customer")
+	fmt.Scan(&uuid)
+	query := `update customers set firstname=$1,lastname=$2,username=$3,email=$4,gender=$5,birthdate=$6,password=$7,status=$8 where customer_id=$9 returning customer_id`
+	err = db.QueryRow(query, cus.FirstName, cus.LastName, cus.Username, cus.Email, cus.Gender, cus.Birthdate, cus.Password, cus.Status, uuid).Scan(&uuid1)
+	//check(err)
+	if err != nil {
+		fmt.Print(err, "1-point")
+	}
+	query = `update adress set country=$1,city=$2,district=$3,postalcodes=$4 where customer_id=$5`
+	_, err = db.Exec(query, ad.Country, ad.City, ad.District, ad.PostalCodes, uuid1)
+	//check(err)
+	if err != nil {
+		fmt.Print(err, "2-point")
+	}
+	query = `update phone set numbers=$1,code=$2 where customer_id=$3`
+	_, err = db.Exec(query, ph.Numbers, ph.Code, uuid1)
+	//check(err)
+	if err != nil {
+		fmt.Print(err, "3-point")
+	}
+	query = `update product set name=$1,cost=$2,ordernumber=$3,amount=$4,currency=$5,rating=$6 where customer_id=$7 returning product_id`
+	err = db.QueryRow(query, pr.Name, pr.Cost, pr.OrderNumber, pr.Amount, pr.Currency, pr.Rating, uuid1).Scan(&uuid)
+	//check(err)
+	if err != nil {
+		fmt.Print(err, "4-point")
+	}
+	query = `update typee set name=$1 where product_id=$2`
+	_, err = db.Exec(query, ty.Name, uuid)
+	if err != nil {
+		fmt.Print(err, "5-point")
+	}
+	defer db.Close()
+	return err
+}
 func (h Dbmethods) Delede(a string) error {
 	connStr := "user=postgres password=1 dbname=shop sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
