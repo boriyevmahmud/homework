@@ -22,6 +22,7 @@ func main() {
     fmt.Println(err)
     return
   }
+  
 
   fmt.Println(result.LastInsertId())
   fmt.Println(result.RowsAffected())
