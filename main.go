@@ -1,7 +1,17 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func main() {
-	fmt.Println("Hi,Mahmud")
+	var a, b int64
+	fmt.Scan(&a, &b)
+	if a < b {
+		fmt.Println("<")
+	} else if b > a {
+		fmt.Println(">")
+	} else {
+		fmt.Println("=")
+	}
 }
